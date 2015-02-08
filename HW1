@@ -1,14 +1,17 @@
 var http = require('http');
 
-http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
+http.createServer(function (request, response) {
+  response.writeHead(200, {'Content-Type': 'text/plain'});
+  info = request.headers['user-agent'];
+  request.on('end', writeIntoFile);
 
-  req.on('end', message);
-  res.end('Hello World\n');
+  //console.log(request.headers['user-agent']);
+  response.end(JSON.stringify(request.headers['user-agent']));
+  
 }).listen(8080);
 
 console.log('Server running at http://8080/');
 
-var message = function(){
-  console.log('Hello again, from the function\n');
-}
+var writeIntoFile = function(){
+  console.log('Hello again, from the function\n' + info);
+};
