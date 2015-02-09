@@ -1,12 +1,19 @@
+//requesting and exporting needed modules
 var http = require('http');
 fs = require('fs');
 var events = require('events');
+
+//event emitter constructor
 var eventEmitter = new events.EventEmitter(); 
 
+//creating server
 http.createServer(function (request, response) {
   response.writeHead(200, {'Content-Type': 'text/plain'});
+  //requestin data from 'user-agent'
   info = request.headers['user-agent'];
+  //I could write the data straight to the file with this:
   //request.on('end', writeIntoFile);
+  //but HW specificatios are to emit an event so I call this function first
   request.on('end', process);
 
   response.end(JSON.stringify(request.headers['user-agent']));
@@ -15,6 +22,7 @@ http.createServer(function (request, response) {
 
 console.log('Server running at http://8080/');
 
+//function to write 'user-agent' data to the log file
 var writeIntoFile = function(){
   fs.readFile('logFile.txt', 'utf-8', function(err, data){
     fs.appendFile('logFile.txt', new Date()+', '+info+'\n');
@@ -22,6 +30,7 @@ var writeIntoFile = function(){
   });
 };
 
+//function to trigger the event
 var process = function process(){
   eventEmitter.on('readFile', writeIntoFile);
   eventEmitter.emit('readFile');
