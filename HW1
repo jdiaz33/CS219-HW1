@@ -1,10 +1,13 @@
 var http = require('http');
 fs = require('fs');
+var events = require('events');
+var eventEmitter = new events.EventEmitter(); 
 
 http.createServer(function (request, response) {
   response.writeHead(200, {'Content-Type': 'text/plain'});
   info = request.headers['user-agent'];
-  request.on('end', writeIntoFile);
+  //request.on('end', writeIntoFile);
+  request.on('end', process);
 
   response.end(JSON.stringify(request.headers['user-agent']));
   
@@ -14,8 +17,12 @@ console.log('Server running at http://8080/');
 
 var writeIntoFile = function(){
   fs.readFile('logFile.txt', 'utf-8', function(err, data){
-    fs.appendFile('logFile.txt', new Date() + '\n');
+    fs.appendFile('logFile.txt', new Date()+', '+info+'\n');
     console.log(data);
   });
-
 };
+
+var process = function process(){
+  eventEmitter.on('readFile', writeIntoFile);
+  eventEmitter.emit('readFile');
+}
